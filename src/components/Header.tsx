@@ -10,37 +10,24 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
-import { setupAccount, removeAccount } from "../context/ImxClientProvider"
+import { useImxClientContext } from "../context/ImxClientContext";
+
 const pages = ['Assets', 'Inventory', 'Transactions'];
 
 const Header = () => {
+  const { connectWallet, disConnectWallet, walletAddress } = useImxClientContext();
   const [anchorElNav, setAnchorElNav] = useState(null);
-  const [address, setAddress] = useState<string | null>(null);
-  const handleOpenNavMenu = (event: any) => {
-    setAnchorElNav(event.currentTarget);
-  };
+  const handleOpenNavMenu = (event: any) => setAnchorElNav(event.currentTarget);
+  const handleCloseNavMenu = () => setAnchorElNav(null);
 
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
-  };
+  const handleWalletConnect = async () => !!connectWallet && await connectWallet();
+  const handleWalletDisconnect = () => !!disConnectWallet && disConnectWallet();
+
 
   useEffect(() => {
-    setAddress(localStorage.getItem("WALLET_ADDRESS"));
-  }, [address]);
+    console.log("context CHanged", {connectWallet, disConnectWallet, walletAddress})
+  }, [connectWallet, disConnectWallet, walletAddress]);
 
-  const handleWalletConnect = async () => {
-    if (!address) {
-      const { address: _address, starkPublicKey } = await setupAccount();
-      console.log(
-        "what returns", { address, starkPublicKey })
-    } else {
-      console.log("Existed Address", { address })
-    }
-  }
-
-  const handleWalletDisconnect = async () => {
-    removeAccount();
-  }
 
   return (
     <AppBar position="static">
@@ -111,7 +98,7 @@ const Header = () => {
             ))}
           </Box>
 
-          {address
+          {walletAddress
             ? <Box sx={{ flexGrow: 0 }}>
               <Button
                 key='wallet'
