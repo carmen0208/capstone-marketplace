@@ -1,7 +1,6 @@
 import * as React from "react";
 
-import ImxClientContext from "./ImxClientContext";
-// import { getImxLink } from "./imxClientManager";
+import ImxClientContext  from "./ImxClientContext";
 import { useImxClientManager } from "./ImxClientManager";
 
 export const ImxClientProvider = ({
@@ -9,7 +8,6 @@ export const ImxClientProvider = ({
 }: {
   children: any;
 }): JSX.Element => {
-  // const imxClient = getImxLink();
   const imxContext = useImxClientManager();
   return (
     <ImxClientContext.Provider value={ imxContext }>

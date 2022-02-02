@@ -11,6 +11,7 @@ import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import { useImxClientContext } from "../context/ImxClientContext";
+import { Link } from 'react-router-dom';
 
 const pages = ['Assets', 'Inventory', 'Transactions'];
 
@@ -25,7 +26,7 @@ const Header = () => {
 
 
   useEffect(() => {
-    console.log("context CHanged", {connectWallet, disConnectWallet, walletAddress})
+    console.log("context Changed", { connectWallet, disConnectWallet, walletAddress })
   }, [connectWallet, disConnectWallet, walletAddress]);
 
 
@@ -73,7 +74,9 @@ const Header = () => {
             >
               {pages.map((page) => (
                 <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">{page}</Typography>
+                  <Link to={page.toLowerCase()}>
+                    <Typography textAlign="center">{page}</Typography>
+                  </Link>
                 </MenuItem>
               ))}
             </Menu>
@@ -88,13 +91,14 @@ const Header = () => {
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
-              <Button
-                key={page}
-                onClick={handleCloseNavMenu}
+              <Box
+                key={page} 
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
-                {page}
-              </Button>
+                <Link to={page.toLowerCase()}>
+                  <Typography textAlign="center">{page}</Typography>
+                </Link>
+              </Box>
             ))}
           </Box>
 
