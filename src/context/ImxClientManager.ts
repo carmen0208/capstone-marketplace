@@ -1,4 +1,4 @@
-import { useReducer, useCallback } from "react";
+import { useReducer, useCallback, useState, useEffect } from "react";
 import { ImmutableXClient, Link } from "@imtbl/imx-sdk";
 
 const linkAddress = "https://link.ropsten.x.immutable.com";
@@ -9,22 +9,23 @@ export const getImxLink = (): Link => {
 };
 
 // IMX Client
-export const getImxClient = async () => {
+export const getImxClient = async (): Promise<ImmutableXClient> => {
   return await ImmutableXClient.build({ publicApiUrl: apiAddress });
+};
+
+export const getImxClientSync = (): ImmutableXClient | undefined => {
+  let client;
+  getImxClient().then((result) => {
+    client = result;
+  });
+  return client;
 };
 
 export const setupAccount = async () => {
   const link = getImxLink();
   const { address, starkPublicKey } = await link.setup({});
-  // localStorage.setItem("WALLET_ADDRESS", address);
-  // localStorage.setItem("STARK_PUBLIC_KEY", starkPublicKey);
   return { address, starkPublicKey };
 };
-
-// export const removeAccount = () => {
-//   localStorage.removeItem("WALLET_ADDRESS");
-//   localStorage.removeItem("STARK_PUBLIC_KEY");
-// };
 
 enum ActionType {
   CONNECT_WALLET,
@@ -55,6 +56,17 @@ export function useImxClientManager() {
   const [state, dispatch] = useReducer(reducer, {});
 
   const { starkPublicKey, walletAddress } = state;
+  const [imxClient, setImxClient] = useState<ImmutableXClient>();
+
+  useEffect(() => {
+    (async () => {
+      if (!imxClient) {
+        const result = await getImxClient();
+        setImxClient(result);
+      }
+    })();
+  }, [imxClient]);
+
   const connectWallet = useCallback(async () => {
     const { address, starkPublicKey } = await setupAccount();
     dispatch({
@@ -67,5 +79,11 @@ export function useImxClientManager() {
     dispatch({ type: ActionType.DISCONNECT_WALLET });
   }, []);
 
-  return { starkPublicKey, walletAddress, connectWallet, disConnectWallet };
+  return {
+    starkPublicKey,
+    walletAddress,
+    connectWallet,
+    disConnectWallet,
+    imxClient,
+  };
 }
